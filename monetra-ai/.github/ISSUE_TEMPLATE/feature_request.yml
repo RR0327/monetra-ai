@@ -1,0 +1,17 @@
+name: Feature request
+description: Propose an improvement to the MVP
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / user need
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution and acceptance criteria
+    validations:
+      required: true
