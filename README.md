@@ -3,7 +3,7 @@
 **An explainable, privacy-conscious personal finance copilot for a synthetic-data hackathon demo.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Backend CI](https://github.com/YOUR_USERNAME/monetra-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/monetra-ai/actions/workflows/ci.yml)
+[![Backend CI](https://github.com/RR0327/monetra-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/RR0327/monetra-ai/actions/workflows/ci.yml)
 
 > **Project status:** Foundation scaffold (Phase 1). Features below describe the planned MVP; they are **not all implemented yet**.
 >
@@ -24,12 +24,12 @@ Monetra AI aims to help a person understand spending, check budgets, forecast po
 
 ## Technology
 
-| Layer | Technology |
-| --- | --- |
-| Client | React, Vite, Tailwind CSS, Recharts |
-| API | FastAPI, Python |
-| Data | SQLite, SQLAlchemy, Pandas, NumPy |
-| AI | Google Gemini API via backend only |
+| Layer   | Technology                                 |
+| ------- | ------------------------------------------ |
+| Client  | React, Vite, Tailwind CSS, Recharts        |
+| API     | FastAPI, Python                            |
+| Data    | SQLite, SQLAlchemy, Pandas, NumPy          |
+| AI      | Google Gemini API via backend only         |
 | Testing | Pytest, FastAPI TestClient, GitHub Actions |
 
 ## Current implementation
@@ -132,14 +132,14 @@ npm run build
 
 ## Development roadmap
 
-| Phase | Goal | Status |
-| --- | --- | --- |
-| 1 | Foundation and local servers | Starter scaffold included |
-| 2 | SQLite, synthetic dataset, CSV validation/import | Planned |
-| 3 | Deterministic financial engine | Planned |
-| 4 | Hosted Gemini integration | Planned |
-| 5 | Complete UI and API integration | Planned |
-| 6 | Tests, demo, documentation, submission | Planned |
+| Phase | Goal                                             | Status                    |
+| ----- | ------------------------------------------------ | ------------------------- |
+| 1     | Foundation and local servers                     | Starter scaffold included |
+| 2     | SQLite, synthetic dataset, CSV validation/import | Planned                   |
+| 3     | Deterministic financial engine                   | Planned                   |
+| 4     | Hosted Gemini integration                        | Planned                   |
+| 5     | Complete UI and API integration                  | Planned                   |
+| 6     | Tests, demo, documentation, submission           | Planned                   |
 
 Read [roadmap](docs/roadmap.md) for the planned sequence.
 
