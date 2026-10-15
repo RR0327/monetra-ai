@@ -151,4 +151,4 @@ We welcome focused issues and pull requests. Please read [CONTRIBUTING.md](CONTR
 
 This project is licensed under the **[MIT License](LICENSE)**. See the separate license file for the full text.
 
-Copyright © 2026 Monetra AI Contributors.
+Copyright © 2026 Tech_Innovators.
