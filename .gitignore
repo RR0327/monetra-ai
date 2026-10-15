@@ -35,3 +35,6 @@ Thumbs.db
 
 # Runtime logs
 *.log
+
+# Not necessary to track these files
+/monetra-ai/
