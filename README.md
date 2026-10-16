@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Project status:** Phase 4 Steps 16–17: core finance features are implemented and a secure, standalone, backend-only hosted Gemini connectivity probe is available. Financial AI chat is planned for Steps 18–20.
+> **Project status:** Phase 4 Steps 18–20 implemented (v0.7.0): grounded financial assistant, verified context, guarded Gemini explanations, read-only chat API and React chatbot. Local live-Gemini and frontend build verification remain required.
 >
 > **Competition:** 2026 Shenzhen International FinTech Competition — Topic A: Personal Finance Assistant.
 
@@ -33,7 +33,7 @@ Monetra AI aims to help a person understand spending, check budgets, forecast po
 
 ## Current implementation
 
-The repository includes a working `/api/v1/health` API, a starter React interface that checks API health, backend tests, a GitHub Actions workflow, and project documentation. Transaction CSV import, categorization, duplicate prevention, listing, and category correction are implemented. Monthly financial summary and category budgets are implemented. Forecasting, risk scoring, simulations, bills management and Gemini chat remain planned.
+The repository includes a working `/api/v1/health` API, a starter React interface that checks API health, backend tests, a GitHub Actions workflow, and project documentation. Transaction CSV import, categorization, duplicate prevention, listing, and category correction are implemented. Monthly financial summary and category budgets are implemented. Forecasting, risk scoring, simulations, bill management and grounded Gemini chat are implemented.
 
 ## Architecture
 
@@ -212,3 +212,13 @@ Google Gemini is **not yet wired to finance questions**. This step adds a secure
 Full setup, error handling, and verification: [Phase 4 Steps 16–17 guide](docs/phase-4-steps-16-17-verification.md). Free-tier eligibility, available models and usage policies depend on the provider and must be verified. The financial dashboard works without Gemini.
 
 Copyright © 2026 Tech_Innovators. Licensed under the [MIT License](LICENSE).
+
+## Phase 4 Steps 18–20: Financial assistant
+
+`POST /api/v1/assistant/chat` receives `month` and `question`, plus optional explicit `purchase_amount_paisa`.
+The server categorizes intent, calls existing read-only deterministic finance services, sends minimal synthetic context to Gemini and returns `answer`, `status`, `source`, `trusted_fields` and `limitations`.
+The chat intentionally displays monetary values only from trusted Python-generated fields. Gemini-generated prose containing numerical figures or suspicious money-movement or guarantee claims is rejected (this restrictive check can reject benign AI explanations). If an amount for a proposed purchase cannot be safely identified, the server requests an explicit BDT amount instead of guessing.
+
+Start backend and frontend as in Quick Start. Run `python -m pytest -v` in `backend`, `npm install` and `npm run build` in `frontend`, then verify the hosted Gemini integration with your **own private backend/.env**. Do not commit the API key, database, dependency folders or build output. See [Phase 4 Steps 18–20 verification](docs/phase-4-steps-18-20-verification.md).
+
+**Limitations:** Keyword intent routing is heuristic. The number guard is intentionally strict, not a formal mathematical proof of all natural-language claims; never treat generated prose as authoritative. No real bank connections or real transaction uploads are supported. Gemini usage depends on provider access, quota and network availability.
