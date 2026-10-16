@@ -3,9 +3,8 @@
 **An explainable, privacy-conscious personal finance copilot for a synthetic-data hackathon demo.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Backend CI](https://github.com/RR0327/monetra-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/RR0327/monetra-ai/actions/workflows/ci.yml)
 
-> **Project status:** Foundation scaffold (Phase 1). Features below describe the planned MVP; they are **not all implemented yet**.
+> **Project status:** Phase 2 Steps 07–09: transaction CSV import and listing implemented. Features below describe the planned MVP; they are **not all implemented yet**.
 >
 > **Competition:** 2026 Shenzhen International FinTech Competition — Topic A: Personal Finance Assistant.
 
@@ -24,17 +23,17 @@ Monetra AI aims to help a person understand spending, check budgets, forecast po
 
 ## Technology
 
-| Layer   | Technology                                 |
-| ------- | ------------------------------------------ |
-| Client  | React, Vite, Tailwind CSS, Recharts        |
-| API     | FastAPI, Python                            |
-| Data    | SQLite, SQLAlchemy, Pandas, NumPy          |
-| AI      | Google Gemini API via backend only         |
+| Layer | Technology |
+| --- | --- |
+| Client | React, Vite, Tailwind CSS, Recharts |
+| API | FastAPI, Python |
+| Data | SQLite, SQLAlchemy, Pandas, NumPy |
+| AI | Google Gemini API via backend only |
 | Testing | Pytest, FastAPI TestClient, GitHub Actions |
 
 ## Current implementation
 
-This initial repository includes a working `/api/v1/health` API, a starter React interface that checks API health, backend tests, a GitHub Actions workflow, and project documentation. Transaction ingestion and financial/AI engines are scheduled for later phases.
+This initial repository includes a working `/api/v1/health` API, a starter React interface that checks API health, backend tests, a GitHub Actions workflow, and project documentation. Transaction CSV import, categorization, duplicate prevention, listing, and category correction are implemented. Financial and AI engines are scheduled for later phases.
 
 ## Architecture
 
@@ -132,14 +131,14 @@ npm run build
 
 ## Development roadmap
 
-| Phase | Goal                                             | Status                    |
-| ----- | ------------------------------------------------ | ------------------------- |
-| 1     | Foundation and local servers                     | Starter scaffold included |
-| 2     | SQLite, synthetic dataset, CSV validation/import | Planned                   |
-| 3     | Deterministic financial engine                   | Planned                   |
-| 4     | Hosted Gemini integration                        | Planned                   |
-| 5     | Complete UI and API integration                  | Planned                   |
-| 6     | Tests, demo, documentation, submission           | Planned                   |
+| Phase | Goal | Status |
+| --- | --- | --- |
+| 1 | Foundation and local servers | Starter available; local verification required |
+| 2 | SQLite, synthetic dataset, CSV validation/import | Steps 06–09 implemented; local verification required |
+| 3 | Deterministic financial engine | Planned |
+| 4 | Hosted Gemini integration | Planned |
+| 5 | Complete UI and API integration | Planned |
+| 6 | Tests, demo, documentation, submission | Planned |
 
 Read [roadmap](docs/roadmap.md) for the planned sequence.
 
@@ -152,3 +151,22 @@ We welcome focused issues and pull requests. Please read [CONTRIBUTING.md](CONTR
 This project is licensed under the **[MIT License](LICENSE)**. See the separate license file for the full text.
 
 Copyright © 2026 Tech_Innovators.
+
+## CSV transaction demo (Phase 2 Steps 07–09)
+
+Use the **Upload CSV** control on the frontend and select `sample_data/transactions.csv` (90 fictional rows), or use Swagger UI at `/docs` → `POST /api/v1/transactions/import`.
+
+- Required CSV columns: `date,description,type,amount`; optional `category`.
+- Dates use `YYYY-MM-DD`; amount uses BDT with no more than 2 decimal places.
+- Valid transaction types: `income` and `expense`. Duplicate transactions are skipped using a stable fingerprint.
+- Results include `imported`, `duplicates`, `invalid_rows`, and up to 30 row error explanations.
+- Reimporting the same CSV should report zero newly imported rows. Category edits persist across reuploads.
+- `GET /api/v1/transactions` shows up to 500 latest rows; use `?month=2026-10` or `?category=Food` to filter.
+
+## Development team
+
+Developed and maintained by **Tech_Innovators**.
+
+## Current checkpoint
+
+Follow [Phase 2 Steps 07–09 verification](docs/phase-2-steps-07-09-verification.md) before starting the financial engine.
