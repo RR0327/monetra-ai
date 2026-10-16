@@ -23,3 +23,5 @@ export const getBills = (status) => api.get('/api/v1/bills', { params: status ? 
 export const createBill = (body) => api.post('/api/v1/bills', body);
 export const markBillPaid = (id) => api.patch(`/api/v1/bills/${id}/paid`);
 export const simulatePurchase = (body) => api.post('/api/v1/simulations/purchase', body);
+
+export const askAssistant = (body) => api.post('/api/v1/assistant/chat', body, { timeout: 30000 });
