@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Activity, FileUp, RefreshCw, Wallet, ChartColumn, PiggyBank, TrendingUp, ShieldAlert } from "lucide-react";
-import { getHealth, importTransactions, getTransactions, changeCategory, getSummary, getBudgets, saveBudget, getForecast } from "./services/api";
+import { Activity, FileUp, RefreshCw, Wallet, ChartColumn, PiggyBank, TrendingUp, ShieldAlert, Receipt, ShoppingCart } from "lucide-react";
+import { getHealth, importTransactions, getTransactions, changeCategory, getSummary, getBudgets, saveBudget, getForecast, getBills, createBill, markBillPaid, simulatePurchase } from "./services/api";
 
 const categories = ["Income", "Food", "Transport", "Shopping", "Utilities", "Rent", "Health", "Education", "Other"];
 const expenseCategories = categories.filter(category => category !== "Income");
@@ -13,6 +13,13 @@ export default function App() {
   const [summary, setSummary] = useState(null);
   const [budgets, setBudgets] = useState([]);
   const [forecast, setForecast] = useState(null);
+  const [bills, setBills] = useState([]);
+  const [purchaseAmount, setPurchaseAmount] = useState("");
+  const [purchaseCategory, setPurchaseCategory] = useState("Shopping");
+  const [simulation, setSimulation] = useState(null);
+  const [billTitle, setBillTitle] = useState("");
+  const [billDue, setBillDue] = useState("");
+  const [billAmount, setBillAmount] = useState("");
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -29,18 +36,55 @@ export default function App() {
   useEffect(() => {
     let active = true;
     setError("");
-    Promise.all([getTransactions({ month }), getSummary(month), getBudgets(month), getForecast(month)])
-      .then(([transactionResponse, summaryResponse, budgetResponse, forecastResponse]) => {
+    Promise.all([getTransactions({ month }), getSummary(month), getBudgets(month), getForecast(month), getBills()])
+      .then(([transactionResponse, summaryResponse, budgetResponse, forecastResponse, billsResponse]) => {
         if (!active) return;
         setRows(transactionResponse.data);
         setSummary(summaryResponse.data);
         setBudgets(budgetResponse.data);
         setForecast(forecastResponse.data);
+        setBills(billsResponse.data.bills);
       })
       .catch(err => { if (active) setError(err.response?.data?.detail || "Could not load financial data"); });
     return () => { active = false; };
   }, [month, refresh]);
+  useEffect(() => { setSimulation(null); }, [month, refresh]);
 
+  function toPaisa(value) {
+    if (!/^\d+(\.\d{1,2})?$/.test(value)) throw new Error("Enter a positive BDT amount with up to two decimals.");
+    const [whole, fraction = ""] = value.split(".");
+    const result = Number(whole) * 100 + Number(fraction.padEnd(2, "0"));
+    if (!Number.isSafeInteger(result) || result <= 0) throw new Error("Enter a valid positive amount.");
+    return result;
+  }
+  async function runSimulation(event) {
+    event.preventDefault(); setError(""); setNotice(""); setSimulation(null);
+    try {
+      const amount = toPaisa(purchaseAmount);
+      setBusy(true);
+      const response = await simulatePurchase({ month, category: purchaseCategory, purchase_amount_paisa: amount });
+      setSimulation(response.data);
+    } catch (err) { setError(err.response?.data?.detail || err.message || "Simulation failed"); }
+    finally { setBusy(false); }
+  }
+  async function addBill(event) {
+    event.preventDefault(); setError(""); setNotice("");
+    try {
+      const amount = toPaisa(billAmount);
+      if (!billTitle.trim() || !billDue) throw new Error("Enter a title and due date.");
+      setBusy(true);
+      await createBill({ title: billTitle.trim(), due_date: billDue, amount_paisa: amount });
+      setBillTitle(""); setBillDue(""); setBillAmount("");
+      setNotice("Bill saved. It is reserved until marked paid."); setRefresh(n => n + 1);
+    } catch (err) { setError(err.response?.data?.detail || err.message || "Could not create bill"); }
+    finally { setBusy(false); }
+  }
+  async function payBill(id) {
+    setBusy(true); setError("");
+    try { await markBillPaid(id); setNotice("Bill marked paid. Record any actual expense separately via CSV to reflect it in the balance."); setRefresh(n => n + 1); }
+    catch (err) { setError(err.response?.data?.detail || "Could not mark bill paid"); }
+    finally { setBusy(false); }
+  }
   async function upload(event) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -80,7 +124,7 @@ export default function App() {
         </header>
         <section className="py-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div><h2 className="text-3xl font-bold">Financial Dashboard</h2><p className="mt-2 text-slate-400">Phase 3 · Exact financial summaries, budgets, forecast and risk</p></div>
+            <div><h2 className="text-3xl font-bold">Financial Dashboard</h2><p className="mt-2 text-slate-400">Phase 3 · Exact summaries, budgets, forecasts, simulations and bills</p></div>
             <label className="text-sm text-slate-300">Selected month <input aria-label="Filter month" type="month" value={month} onChange={e => setMonth(e.target.value)} className="ml-2 rounded bg-slate-800 p-2"/></label>
           </div>
           <div className="mt-5 rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm"><div className="flex items-center gap-2 text-teal-300"><Activity size={18}/> Backend connection</div><p className="mt-2" role="status">{health}</p></div>
@@ -114,6 +158,43 @@ export default function App() {
               <details className="mt-3 text-sm text-slate-400"><summary className="cursor-pointer">View calculation assumptions</summary><ul className="mt-2 list-disc space-y-1 pl-5">{forecast.assumptions.map(text => <li key={text}>{text}</li>)}</ul></details>
             </>}
           </section>
+          <div className="mt-8 grid gap-5 lg:grid-cols-2">
+            <section className="rounded-xl border border-slate-800 bg-slate-900 p-5" aria-label="Purchase simulation">
+              <h3 className="flex items-center gap-2 text-xl font-semibold"><ShoppingCart size={20}/> What-if purchase simulator</h3>
+              <p className="mt-2 text-sm text-slate-400">Preview a planned purchase without saving a transaction.</p>
+              <form className="mt-4 space-y-3" onSubmit={runSimulation}>
+                <label className="block text-sm">Purchase amount (BDT)<input required aria-label="Purchase amount BDT" inputMode="decimal" value={purchaseAmount} onChange={e=>setPurchaseAmount(e.target.value)} placeholder="e.g. 2500.00" className="mt-1 w-full rounded bg-slate-800 p-2"/></label>
+                <label className="block text-sm">Category<select aria-label="Purchase category" value={purchaseCategory} onChange={e=>setPurchaseCategory(e.target.value)} className="mt-1 w-full rounded bg-slate-800 p-2">{expenseCategories.map(c=><option key={c}>{c}</option>)}</select></label>
+                <button disabled={busy} className="rounded bg-teal-600 px-5 py-2 font-semibold disabled:opacity-50">Simulate purchase</button>
+              </form>
+              {simulation && <div className="mt-4 space-y-2 rounded-lg border border-slate-700 p-4 text-sm" role="status">
+                <p>Balance after purchase: <strong>{money(simulation.balance_after_purchase_paisa)}</strong></p>
+                <p>Spendable after reserved bills: <strong>{money(simulation.spendable_after_bills_paisa)}</strong></p>
+                <p>After estimated remaining expenses: <strong>{simulation.spendable_after_essentials_paisa == null ? "Unavailable" : money(simulation.spendable_after_essentials_paisa)}</strong></p>
+                <p>Risk: <strong>{simulation.risk_level_before.toUpperCase()} → {simulation.risk_level_after.toUpperCase()}</strong></p>
+                <p className="text-amber-300">{simulation.warning}</p>
+                <details className="text-slate-400"><summary className="cursor-pointer">Simulation assumptions</summary><ul className="list-disc pl-5">{simulation.assumptions.map(a=><li key={a}>{a}</li>)}</ul></details>
+              </div>}
+            </section>
+            <section className="rounded-xl border border-slate-800 bg-slate-900 p-5" aria-label="Upcoming bills">
+              <h3 className="flex items-center gap-2 text-xl font-semibold"><Receipt size={20}/> Bills and reservations</h3>
+              <p className="mt-2 text-sm text-slate-400">Pending bills due through the selected month are included in your spendable balance.</p>
+              <form onSubmit={addBill} className="mt-4 grid gap-3">
+                <label className="text-sm">Bill title<input aria-label="Bill title" required maxLength={200} value={billTitle} onChange={e=>setBillTitle(e.target.value)} className="mt-1 w-full rounded bg-slate-800 p-2"/></label>
+                <label className="text-sm">Due date<input aria-label="Bill due date" required type="date" value={billDue} onChange={e=>setBillDue(e.target.value)} className="mt-1 w-full rounded bg-slate-800 p-2"/></label>
+                <label className="text-sm">Amount (BDT)<input aria-label="Bill amount BDT" required inputMode="decimal" value={billAmount} onChange={e=>setBillAmount(e.target.value)} className="mt-1 w-full rounded bg-slate-800 p-2"/></label>
+                <button disabled={busy} className="w-fit rounded bg-teal-600 px-5 py-2 font-semibold disabled:opacity-50">Add bill</button>
+              </form>
+              <div className="mt-5 max-h-64 space-y-3 overflow-y-auto">
+                {bills.map(b=><div key={b.id} className="flex flex-wrap items-center justify-between gap-2 rounded border border-slate-700 p-3 text-sm">
+                  <div><strong>{b.title}</strong><p className="text-slate-400">{b.due_date} · {money(b.amount_paisa)} · {b.status}</p></div>
+                  {b.status === "pending" && <button disabled={busy} onClick={()=>payBill(b.id)} className="rounded border border-teal-700 px-3 py-1 text-teal-300 disabled:opacity-50">Mark paid</button>}
+                </div>)}
+                {!bills.length && <p className="text-sm text-slate-400">No bills yet.</p>}
+              </div>
+              <p className="mt-3 text-xs text-amber-200">Marking paid only removes the reservation; it does not record a payment transaction. Import the corresponding expense once to keep your balance accurate.</p>
+            </section>
+          </div>
           <div className="mt-8 grid gap-5 lg:grid-cols-2">
             <section className="rounded-xl border border-slate-800 bg-slate-900 p-5">
               <h3 className="flex items-center gap-2 text-xl font-semibold"><ChartColumn size={20}/> Category spending</h3>

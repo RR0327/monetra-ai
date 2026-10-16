@@ -18,3 +18,8 @@ export const saveBudget = (body) => api.put("/api/v1/budgets", body);
 export default api;
 
 export const getForecast = (month) => api.get("/api/v1/forecast", { params: { month } });
+
+export const getBills = (status) => api.get('/api/v1/bills', { params: status ? { status } : {} });
+export const createBill = (body) => api.post('/api/v1/bills', body);
+export const markBillPaid = (id) => api.patch(`/api/v1/bills/${id}/paid`);
+export const simulatePurchase = (body) => api.post('/api/v1/simulations/purchase', body);
