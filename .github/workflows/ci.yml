@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         working-directory: frontend
         run: npm install
+      - name: Frontend architecture tests
+        working-directory: frontend
+        run: node --test tests/architecture.test.mjs
       - name: Build
         working-directory: frontend
         run: npm run build
