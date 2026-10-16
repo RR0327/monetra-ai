@@ -45,3 +45,8 @@ Returns array of `{id,month,category,limit_paisa,spent_paisa,remaining_paisa,uti
 Request `{ "month": "2026-10", "category": "Food", "limit_paisa": 500000 }`. Allowed categories: Food, Transport, Shopping, Utilities, Rent, Health, Education, Other. Returns one budget object (creates or updates the same month/category entry). Rejects negatives and unsupported categories with 422.
 
 Copyright © 2026 Tech_Innovators.
+
+
+### GET `/api/v1/forecast?month=YYYY-MM`
+
+Returns `month`, `currency`, `as_of_date`, `cutoff_date`, `days_in_month`, `elapsed_days`, `recorded_expenses_paisa`, `projected_month_end_expenses_paisa`, `estimated_remaining_expenses_paisa`, `available_funds_paisa`, `unpaid_bills_paisa`, `projected_obligations_paisa`, `risk_level` (`low`/`medium`/`high`/`unknown`), `risk_ratio_percent`, `confidence`, `status`, `assumptions`, and `warning`. Future months have no projected amount. All monetary amounts are integer paisa.
