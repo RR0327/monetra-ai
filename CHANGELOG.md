@@ -1,3 +1,10 @@
+## [0.6.0] — Phase 4 Steps 16–17
+
+- Add backend-only Gemini environment settings and independent hosted connection probe.
+- Handle missing configuration and quota, access, model, and network failures with safe status messages.
+- Add mocked probe regression tests and step-by-step setup documentation.
+- Do not add Gemini chat or client-side API credentials at this stage.
+
 ## [0.4.0] — Phase 3 Steps 12–13
 - Added run-rate forecasting, risk classification, confidence warnings, and API.
 - Added React forecast panel and automated regression checks.
