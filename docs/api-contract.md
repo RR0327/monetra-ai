@@ -50,3 +50,25 @@ Copyright © 2026 Tech_Innovators.
 ### GET `/api/v1/forecast?month=YYYY-MM`
 
 Returns `month`, `currency`, `as_of_date`, `cutoff_date`, `days_in_month`, `elapsed_days`, `recorded_expenses_paisa`, `projected_month_end_expenses_paisa`, `estimated_remaining_expenses_paisa`, `available_funds_paisa`, `unpaid_bills_paisa`, `projected_obligations_paisa`, `risk_level` (`low`/`medium`/`high`/`unknown`), `risk_ratio_percent`, `confidence`, `status`, `assumptions`, and `warning`. Future months have no projected amount. All monetary amounts are integer paisa.
+
+## Phase 3 Steps 14–15 endpoints
+
+All money amounts use integer paisa. Responses are derived from the local fictional demo database.
+
+### POST `/api/v1/simulations/purchase`
+
+Request: `{"month":"2026-10","category":"Shopping","purchase_amount_paisa":200000}`. Returns balance after purchase, balance after pending bills, estimated balance after forecast remaining spending, before/after risk, warning, assumptions. Never inserts a transaction. Rejects invalid amount, category or month with HTTP 422.
+
+### POST `/api/v1/bills`
+
+Request: `{"title":"Internet","due_date":"2026-10-20","amount_paisa":100000}`. Returns new pending bill with HTTP 201.
+
+### GET `/api/v1/bills`
+
+Optional query `status=pending|paid`. Returns `{ "bills": [...], "pending_total_paisa": 0, "currency":"BDT" }` (total applies to returned list). Bills are sorted by due date.
+
+### PATCH `/api/v1/bills/{bill_id}/paid`
+
+Marks an existing bill paid (idempotent). HTTP 404 if not found. It stops the pending reserve and does **not** record a payment transaction; import the matching actual expense independently once.
+
+**Scope/limitation:** Bill reservations include all currently pending bills due before the end of the selected month, even overdue bills. Historical snapshots use current statuses, not reconstructed historical states. The forecast run-rate is a statistical estimate, not trained machine learning.
