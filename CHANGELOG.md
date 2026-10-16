@@ -1,3 +1,8 @@
+## [0.4.0] — Phase 3 Steps 12–13
+- Added run-rate forecasting, risk classification, confidence warnings, and API.
+- Added React forecast panel and automated regression checks.
+- Copyright © 2026 Tech_Innovators.
+
 # Changelog
 
 Notable project changes are recorded here.
