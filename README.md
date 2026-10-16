@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Project status:** Phase 2 Steps 07–09: transaction CSV import and listing implemented. Features below describe the planned MVP; they are **not all implemented yet**.
+> **Project status:** Phase 3 Steps 10–11: exact monthly financial summary and category budgets implemented. Features below describe the planned MVP; they are **not all implemented yet**.
 >
 > **Competition:** 2026 Shenzhen International FinTech Competition — Topic A: Personal Finance Assistant.
 
@@ -33,7 +33,7 @@ Monetra AI aims to help a person understand spending, check budgets, forecast po
 
 ## Current implementation
 
-This initial repository includes a working `/api/v1/health` API, a starter React interface that checks API health, backend tests, a GitHub Actions workflow, and project documentation. Transaction CSV import, categorization, duplicate prevention, listing, and category correction are implemented. Financial and AI engines are scheduled for later phases.
+This initial repository includes a working `/api/v1/health` API, a starter React interface that checks API health, backend tests, a GitHub Actions workflow, and project documentation. Transaction CSV import, categorization, duplicate prevention, listing, and category correction are implemented. Monthly financial summary and category budgets are implemented. Forecasting, risk scoring, simulations, bills management and Gemini chat remain planned.
 
 ## Architecture
 
@@ -135,7 +135,7 @@ npm run build
 | --- | --- | --- |
 | 1 | Foundation and local servers | Starter available; local verification required |
 | 2 | SQLite, synthetic dataset, CSV validation/import | Steps 06–09 implemented; local verification required |
-| 3 | Deterministic financial engine | Planned |
+| 3 | Deterministic financial engine | Steps 10–11 implemented; steps 12–15 planned |
 | 4 | Hosted Gemini integration | Planned |
 | 5 | Complete UI and API integration | Planned |
 | 6 | Tests, demo, documentation, submission | Planned |
@@ -169,4 +169,16 @@ Developed and maintained by **Tech_Innovators**.
 
 ## Current checkpoint
 
-Follow [Phase 2 Steps 07–09 verification](docs/phase-2-steps-07-09-verification.md) before starting the financial engine.
+Follow [Phase 3 Steps 10–11 verification](docs/phase-3-steps-10-11-verification.md) before implementing forecasting and risk assessment.
+
+## Monthly financial dashboard and budgets (Phase 3 Steps 10–11)
+
+- `GET /api/v1/summary?month=2026-10` returns monthly income, expenses, category expense subtotals, carried-in balance, balance through the month and spendable balance after reserving pending bills.
+- `GET /api/v1/budgets?month=2026-10` lists configured budgets with actual spending, remaining funds, utilization percentage and status.
+- `PUT /api/v1/budgets` creates or updates a month/category budget; request example: `{"month":"2026-10","category":"Food","limit_paisa":500000}` (BDT 5,000). A limit of 0 reports `no_budget` and no utilization percentage.
+- Every authoritative amount is calculated by Python/SQLAlchemy using integer paisa, not estimated or recalculated in the frontend.
+- The selected month's opening balance is the configured opening balance plus **recorded** net transactions before the month. Transactions dated after the selected month are excluded.
+- Pending bills due by the selected month's end are reserved based on their current stored status. Historical bill-status snapshots are not available yet; full bill creation/payment and reconciliation arrive in Step 15.
+- No settings editor is included yet; the default configured opening balance is zero unless a `settings` row is added separately.
+
+Copyright © 2026 Tech_Innovators.
