@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Project status:** Phase 3 Steps 10–11: exact monthly financial summary and category budgets implemented. Features below describe the planned MVP; they are **not all implemented yet**.
+> **Project status:** Phase 3 Steps 12–13: exact monthly financial summary and category budgets implemented. Features below describe the planned MVP; they are **not all implemented yet**.
 >
 > **Competition:** 2026 Shenzhen International FinTech Competition — Topic A: Personal Finance Assistant.
 
@@ -169,9 +169,9 @@ Developed and maintained by **Tech_Innovators**.
 
 ## Current checkpoint
 
-Follow [Phase 3 Steps 10–11 verification](docs/phase-3-steps-10-11-verification.md) before implementing forecasting and risk assessment.
+Follow [Phase 3 Steps 12–13 verification](docs/phase-3-steps-10-11-verification.md) before implementing forecasting and risk assessment.
 
-## Monthly financial dashboard and budgets (Phase 3 Steps 10–11)
+## Monthly financial dashboard and budgets (Phase 3 Steps 12–13)
 
 - `GET /api/v1/summary?month=2026-10` returns monthly income, expenses, category expense subtotals, carried-in balance, balance through the month and spendable balance after reserving pending bills.
 - `GET /api/v1/budgets?month=2026-10` lists configured budgets with actual spending, remaining funds, utilization percentage and status.
@@ -182,3 +182,10 @@ Follow [Phase 3 Steps 10–11 verification](docs/phase-3-steps-10-11-verificatio
 - No settings editor is included yet; the default configured opening balance is zero unless a `settings` row is added separately.
 
 Copyright © 2026 Tech_Innovators.
+
+
+## Phase 3 Steps 12–13: forecast and risk
+
+`GET /api/v1/forecast?month=YYYY-MM` returns a Python-calculated calendar-day spending projection, actual expenses through the cutoff, available funds, unpaid bill reserve, risk classification, confidence and assumptions. Future months return `not_available`; completed months show actual spending. Less than seven elapsed days is labelled low confidence. The model does not learn from data and does not guarantee future expenses. See [verification instructions](docs/phase-3-steps-12-13-verification.md).
+
+Copyright © 2026 Tech_Innovators. Licensed under the [MIT License](LICENSE).
