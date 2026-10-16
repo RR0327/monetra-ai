@@ -72,3 +72,32 @@ Optional query `status=pending|paid`. Returns `{ "bills": [...], "pending_total_
 Marks an existing bill paid (idempotent). HTTP 404 if not found. It stops the pending reserve and does **not** record a payment transaction; import the matching actual expense independently once.
 
 **Scope/limitation:** Bill reservations include all currently pending bills due before the end of the selected month, even overdue bills. Historical snapshots use current statuses, not reconstructed historical states. The forecast run-rate is a statistical estimate, not trained machine learning.
+
+
+## Phase 4 Steps 18–20 endpoint
+
+### POST `/api/v1/assistant/chat`
+
+**Request** (month required for deterministic month selection):
+
+```json
+{"month":"2026-10","question":"Can I buy a phone for 1200 BDT?"}
+```
+
+For purchase questions with no unambiguous BDT amount, include `"purchase_amount_paisa":120000` or provide a clear BDT amount in the question.
+
+**Response:**
+
+```json
+{
+  "month":"2026-10", "currency":"BDT", "intent":"purchase",
+  "status":"connected", "source":"gemini",
+  "answer":"Consider your essential spending and upcoming obligations before deciding.",
+  "trusted_fields": {"month":"2026-10","currency":"BDT","summary":{"opening_balance_paisa":0,"income_paisa":0,"expenses_paisa":0,"balance_paisa":0,"unpaid_bills_paisa":0,"spendable_paisa":0},"forecast":{},"simulation":{}},
+  "limitations":["Educational prototype using fictional data; not professional financial advice."]
+}
+```
+
+Above values are **illustrative of response shape only**, not a live financial response. Actual `trusted_fields` include complete selected data from Python services.
+
+`status`: `connected`, `not_configured`, `quota_exceeded`, `access_denied`, `model_unavailable`, `network_error`, `invalid_request`, `provider_unavailable`, `empty_response`, `unsafe_response`, or `needs_amount`. `source` is `gemini` only for a successful, guarded model explanation; otherwise `deterministic`. All calculated monetary fields are integer paisa. Gemini text is never the authoritative numerical source. Missing/invalid input returns 422. API has no database write operations.
