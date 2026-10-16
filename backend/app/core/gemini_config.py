@@ -5,8 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load only the backend-local dotenv. Existing shell environment wins.
-load_dotenv(Path(__file__).resolve().parents[3] / ".env", override=False)
-
+load_dotenv(Path(__file__).resolve().parents[2] / ".env", override=True)
 
 @dataclass(frozen=True)
 class GeminiSettings:
