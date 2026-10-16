@@ -9,5 +9,5 @@ def test_health():
     assert response.json() == {
         "status": "ok",
         "project": "Monetra AI",
-        "version": "0.3.0",
+        "version": "0.4.0",
     }
