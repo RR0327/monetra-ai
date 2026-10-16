@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Project status:** Phase 4 Steps 18–20 implemented (v0.7.0): grounded financial assistant, verified context, guarded Gemini explanations, read-only chat API and React chatbot. Local live-Gemini and frontend build verification remain required.
+> **Project status:** Phase 6 Steps 25–28 release preparation: 40 backend tests (including three synthetic API journeys), four frontend architecture checks, refreshed architecture/demo/submission documents. Backend API remains v0.7.0. Browser build, live Gemini, and official submission requirements must be verified locally.
 >
 > **Competition:** 2026 Shenzhen International FinTech Competition — Topic A: Personal Finance Assistant.
 
@@ -228,3 +228,17 @@ Start backend and frontend as in Quick Start. Run `python -m pytest -v` in `back
 React now provides distinct, routed **Dashboard**, **Transactions**, **Forecast & Simulator**, **AI Assistant**, and **Bills** screens, a persistent global month filter, responsive/mobile navigation, accessible loading/error notices and preserved finance operations. It uses `react-router-dom` already present in the project. Network requests remain centralized in `frontend/src/services/api.js`, and Python alone calculates trusted monetary totals. No new backend endpoints or database migration are required; `/api/v1/health` continues to report backend version 0.7.0.
 
 **Start and verify:** see [Phase 5 verification guide](docs/phase-5-steps-21-24-verification.md) and [full replacement file list](docs/phase-5-full-replacement-files.md). Run `node --test tests/architecture.test.mjs`, `npm ci`, `npm run build` from `frontend/` and `python -m pytest -v` from `backend/`. An end-to-end local browser check remains required.
+
+## Phase 6: final release and competition handoff
+
+- [Architecture and trust boundaries](docs/architecture.md)
+- [Three-minute demo script](docs/demo-script.md)
+- [Submission checklist (official requirements pending independent verification)](docs/submission-checklist.md)
+- [Phase 6 verification: 16 checks](docs/phase-6-steps-25-28-verification.md)
+- [Full replacement-file manifest](docs/phase-6-full-replacement-files.md)
+
+From `backend/`, run `python -m pytest -v` (expected 40 tests). From `frontend/`, run `node --test tests/architecture.test.mjs` (expected 4 tests) followed by `npm ci` and `npm run build`. The backend automated tests use isolated fictional data and mocked Gemini settings, so they do not prove that live Gemini is currently reachable.
+
+**Data and safety:** Only synthetic transactions for demo; no bank credentials, user authentication, live transfers or production readiness. Python is authoritative for money fields. Gemini is explanatory, with conservative safeguards and controlled fallback, not a guarantee against all generated inaccuracies.
+
+**Ownership:** © 2026 Tech_Innovators. Distributed under the [MIT License](LICENSE).
