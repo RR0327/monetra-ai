@@ -1,35 +1,26 @@
-# API Contract (Planned)
+# Monetra AI API Contract
 
-**Canonical base path: `/api/v1`.** Endpoints below except health are planned, not implemented.
+Copyright © 2026 Tech_Innovators.
 
-| Method | Route | Responsibility |
-| --- | --- | --- |
-| GET | `/api/v1/health` | Implemented: service readiness |
-| POST | `/api/v1/transactions/import` | Upload / validate / deduplicate CSV |
-| GET | `/api/v1/transactions` | Filter/list transactions |
-| PATCH | `/api/v1/transactions/{id}` | Correct a category |
-| GET | `/api/v1/summary?month=YYYY-MM` | Exact totals and category spending |
-| PUT | `/api/v1/budgets` | Set monthly category budget |
-| GET | `/api/v1/budgets?month=YYYY-MM` | Read budgets and utilization |
-| GET | `/api/v1/forecast?month=YYYY-MM` | Estimate and risk assumptions |
-| POST | `/api/v1/simulations/purchase` | Read-only purchase scenario |
-| POST | `/api/v1/bills` | Add demo bill |
-| GET | `/api/v1/bills` | List unpaid and paid bills |
-| PATCH | `/api/v1/bills/{id}/paid` | Mark bill paid |
-| POST | `/api/v1/assistant/chat` | Grounded Gemini explanation |
+Canonical prefix: `/api/v1`. Amounts are **integer paisa** in API responses.
 
-## Example: health (implemented)
+| Method | Endpoint | Status | Description |
+| --- | --- | --- | --- |
+| GET | `/api/v1/health` | Implemented | API status |
+| POST | `/api/v1/transactions/import` | Implemented | Multipart `file` CSV upload; returns `imported`, `duplicates`, `invalid_rows`, `errors` |
+| GET | `/api/v1/transactions` | Implemented | Up to 500 latest records; optional `month=YYYY-MM`, `category` |
+| PATCH | `/api/v1/transactions/{id}` | Implemented | JSON `{"category":"Food"}` updates the user's category |
+| GET | `/api/v1/summary` | Planned | Exact monthly summary |
+| PUT / GET | `/api/v1/budgets` | Planned | Category spending limits |
+| GET | `/api/v1/forecast` | Planned | Month-end projection and risk |
+| POST | `/api/v1/simulations/purchase` | Planned | No-write purchase simulation |
+| GET / POST | `/api/v1/bills` | Planned | Pending and paid obligations |
+| POST | `/api/v1/assistant/chat` | Planned | Grounded Gemini explanation |
 
-```json
-{"status":"ok","project":"Monetra AI","version":"0.1.0"}
-```
+## CSV Contract
 
-## Example: purchase simulation (planned)
+`date,description,type,amount,category` (category optional). UTF-8, maximum 2 MB, up to 10,000 rows. Dates ISO `YYYY-MM-DD`, positive BDT decimal amounts with at most 2 fractional digits, `income` or `expense` type. Files with invalid headers are rejected; invalid rows are reported and skipped. Duplicates are identified with a SHA-256 fingerprint excluding category.
 
-```json
-{"month":"2026-10","amount_paisa":500000,"category":"Shopping"}
-```
+## Security/limits
 
-Response fields will distinguish recorded balance, pending bill reserve, simulation impact, and expected future essentials. No purchases are committed during simulations.
-
-**Important:** Some original project guides used unversioned `/api` endpoints, while another used `/api/v1`. This repository standardizes on `/api/v1`; adjust any future snippets accordingly.
+Synthetic demo data only. No auth or live financial accounts. Never send API keys through frontend. Never assume this is safe for public deployment.
