@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Project status:** Phase 3 Steps 14–15: transaction imports, dashboard, monthly budgets, forecast/risk, read-only what-if simulation and bills are implemented. Hosted Gemini AI is not yet integrated.
+> **Project status:** Phase 4 Steps 16–17: core finance features are implemented and a secure, standalone, backend-only hosted Gemini connectivity probe is available. Financial AI chat is planned for Steps 18–20.
 >
 > **Competition:** 2026 Shenzhen International FinTech Competition — Topic A: Personal Finance Assistant.
 
@@ -33,7 +33,7 @@ Monetra AI aims to help a person understand spending, check budgets, forecast po
 
 ## Current implementation
 
-This initial repository includes a working `/api/v1/health` API, a starter React interface that checks API health, backend tests, a GitHub Actions workflow, and project documentation. Transaction CSV import, categorization, duplicate prevention, listing, and category correction are implemented. Monthly financial summary and category budgets are implemented. Forecasting, risk scoring, simulations, bills management and Gemini chat remain planned.
+The repository includes a working `/api/v1/health` API, a starter React interface that checks API health, backend tests, a GitHub Actions workflow, and project documentation. Transaction CSV import, categorization, duplicate prevention, listing, and category correction are implemented. Monthly financial summary and category budgets are implemented. Forecasting, risk scoring, simulations, bills management and Gemini chat remain planned.
 
 ## Architecture
 
@@ -202,5 +202,13 @@ New endpoints:
 - `POST /api/v1/bills`
 - `GET /api/v1/bills`
 - `PATCH /api/v1/bills/{bill_id}/paid`
+
+Copyright © 2026 Tech_Innovators. Licensed under the [MIT License](LICENSE).
+
+## Phase 4 Steps 16–17: Gemini API setup and connectivity
+
+Google Gemini is **not yet wired to finance questions**. This step adds a secure standalone connectivity check and mocked tests. To verify your own hosted access, use `backend/.env.example` to create a local, Git-ignored `backend/.env` with `GEMINI_API_KEY` and a provider-verified `GEMINI_MODEL`. Then, from `backend/`, run `python -m scripts.check_gemini`. The script sends only a fixed, non-financial test prompt; it does not send financial or transaction data.
+
+Full setup, error handling, and verification: [Phase 4 Steps 16–17 guide](docs/phase-4-steps-16-17-verification.md). Free-tier eligibility, available models and usage policies depend on the provider and must be verified. The financial dashboard works without Gemini.
 
 Copyright © 2026 Tech_Innovators. Licensed under the [MIT License](LICENSE).
