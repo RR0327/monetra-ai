@@ -1,0 +1,18 @@
+{
+  "source_zip": "Monetra_AI_Phase6_Steps25-28_Complete_Repository.zip",
+  "sha256": "d3a5851b926078011fb71716b28e13732bda1fd759b4962ccaf0c75ed475e47a",
+  "entries": 101,
+  "checks": {
+    "MIT LICENSE with owner": true,
+    "custom gitignore line": true,
+    "assistant API": true,
+    "five frontend pages": true,
+    "no prohibited secrets/database filenames": true,
+    "zip CRC integrity": true
+  },
+  "excluded_filename_findings": [],
+  "automated_backend_test_result": "40 passed, independently rerun in available Phase 6 workspace",
+  "frontend_build": "user reports passed; not independently run in this audit",
+  "live_gemini": "user reports passed; not independently run in this audit",
+  "submission": "not submitted"
+}
