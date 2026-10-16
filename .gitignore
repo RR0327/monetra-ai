@@ -15,11 +15,11 @@ venv/
 htmlcov/
 
 # Local database and user data
-*.db
-*.sqlite
-*.sqlite3
-backend/uploads/
-backend/data/
+# *.db
+# *.sqlite
+# *.sqlite3
+# backend/uploads/
+# backend/data/
 
 # Node/Vite
 node_modules/
