@@ -1,3 +1,11 @@
+## Phase 6 — Final release preparation (2026-10-17)
+
+- Added three synthetic end-to-end backend API tests covering healthy budgets, cash-flow pressure with read-only simulation, and bill settlement under AI fallback. Backend test count: **40 passing** in the build environment.
+- Refreshed architecture and competition demo documents; added submission and local sign-off checklists.
+- Updated CI to run the existing four frontend architecture tests as well as the Vite production build.
+- Retained the unchanged backend API version 0.7.0, frontend source, financial engine, Tech_Innovators copyright, MIT License, and custom `.gitignore` rule.
+- Live Gemini, manual browser test, frontend production build on the demonstration machine and official submission details remain local/external verification items.
+
 ## [0.7.0] — Phase 4 Steps 18–20
 - Added deterministic intent routing and privacy-minimized finance context retrieval.
 - Added backend-only grounded Gemini explanations, cautious output guards and controlled outages.
