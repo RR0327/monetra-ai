@@ -222,3 +222,9 @@ The chat intentionally displays monetary values only from trusted Python-generat
 Start backend and frontend as in Quick Start. Run `python -m pytest -v` in `backend`, `npm install` and `npm run build` in `frontend`, then verify the hosted Gemini integration with your **own private backend/.env**. Do not commit the API key, database, dependency folders or build output. See [Phase 4 Steps 18–20 verification](docs/phase-4-steps-18-20-verification.md).
 
 **Limitations:** Keyword intent routing is heuristic. The number guard is intentionally strict, not a formal mathematical proof of all natural-language claims; never treat generated prose as authoritative. No real bank connections or real transaction uploads are supported. Gemini usage depends on provider access, quota and network availability.
+
+## Phase 5 Steps 21–24 — Multi-page React architecture
+
+React now provides distinct, routed **Dashboard**, **Transactions**, **Forecast & Simulator**, **AI Assistant**, and **Bills** screens, a persistent global month filter, responsive/mobile navigation, accessible loading/error notices and preserved finance operations. It uses `react-router-dom` already present in the project. Network requests remain centralized in `frontend/src/services/api.js`, and Python alone calculates trusted monetary totals. No new backend endpoints or database migration are required; `/api/v1/health` continues to report backend version 0.7.0.
+
+**Start and verify:** see [Phase 5 verification guide](docs/phase-5-steps-21-24-verification.md) and [full replacement file list](docs/phase-5-full-replacement-files.md). Run `node --test tests/architecture.test.mjs`, `npm ci`, `npm run build` from `frontend/` and `python -m pytest -v` from `backend/`. An end-to-end local browser check remains required.
