@@ -41,3 +41,10 @@ Notable project changes are recorded here.
 - Added purchase simulator and bill controls to existing React dashboard.
 - Added four integration tests for bills, validation, simulation and read-only persistence.
 - Updated version, documentation and Tech_Innovators ownership conventions.
+
+## Phase 5 — Steps 21–24 (frontend architecture update)
+- Split monolithic dashboard views into five routed React pages; persistent global month selection and action handlers preserve original backend contracts.
+- Added mobile-friendly application shell, active navigation, loading/error/success feedback and shared formatting utilities.
+- Kept Axios API methods centralized in `frontend/src/services/api.js`; no finance arithmetic was moved to AI or client.
+- Added independent frontend architecture checks and a 16-item local integration verification guide.
+- Backend API remains v0.7.0; existing regression suite reports 37 passing tests. Vite production build requires local verification due to unavailable native Rollup dependency in the packaging environment.
