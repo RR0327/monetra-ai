@@ -19,3 +19,11 @@ Notable project changes are recorded here.
 - Integrated financial cards, category bars and budget editor in React.
 - Added finance/budget tests and Phase 3 verification guide.
 - Copyright © 2026 Tech_Innovators.
+
+## [0.5.0] — 2026-10-16
+
+- Added read-only purchase simulation with revised risk and conservative future spending reserve.
+- Added bill creation, listing, paid status and integration into balances/forecasts.
+- Added purchase simulator and bill controls to existing React dashboard.
+- Added four integration tests for bills, validation, simulation and read-only persistence.
+- Updated version, documentation and Tech_Innovators ownership conventions.
