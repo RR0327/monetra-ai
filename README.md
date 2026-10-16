@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Project status:** Phase 3 Steps 12–13: exact monthly financial summary and category budgets implemented. Features below describe the planned MVP; they are **not all implemented yet**.
+> **Project status:** Phase 3 Steps 14–15: transaction imports, dashboard, monthly budgets, forecast/risk, read-only what-if simulation and bills are implemented. Hosted Gemini AI is not yet integrated.
 >
 > **Competition:** 2026 Shenzhen International FinTech Competition — Topic A: Personal Finance Assistant.
 
@@ -12,13 +12,13 @@
 
 Monetra AI aims to help a person understand spending, check budgets, forecast possible shortfalls, simulate purchases, and ask grounded financial questions. Backend Python services calculate monetary values; the hosted Gemini service explains **verified** values rather than determining balances.
 
-## Planned MVP features
+## MVP feature status
 
 - **Import transactions:** Validate CSV files, classify categories, and skip duplicate entries.
 - **Financial dashboard:** Income, expenses, available balance, and category budgets.
 - **Forecast and risk signals:** Transparent month-end estimates and explainable alerts.
-- **Upcoming bills:** Reserve pending obligations without double counting.
-- **What-if purchase simulator:** Read-only scenarios that never alter stored transactions.
+- **Upcoming bills (implemented):** Create, list, and mark bills paid; reserve pending obligations without double counting.
+- **What-if purchase simulator (implemented):** Read-only scenarios that never alter stored transactions.
 - **AI explanations:** Gemini-powered finance Q&A grounded in Python-calculated data, with clear outage handling.
 
 ## Technology
@@ -187,5 +187,20 @@ Copyright © 2026 Tech_Innovators.
 ## Phase 3 Steps 12–13: forecast and risk
 
 `GET /api/v1/forecast?month=YYYY-MM` returns a Python-calculated calendar-day spending projection, actual expenses through the cutoff, available funds, unpaid bill reserve, risk classification, confidence and assumptions. Future months return `not_available`; completed months show actual spending. Less than seven elapsed days is labelled low confidence. The model does not learn from data and does not guarantee future expenses. See [verification instructions](docs/phase-3-steps-12-13-verification.md).
+
+Copyright © 2026 Tech_Innovators. Licensed under the [MIT License](LICENSE).
+
+## Phase 3 Steps 14–15: Run and verify
+
+See [verification instructions](docs/phase-3-steps-14-15-verification.md).
+
+Bill settlement changes a bill's status **only**; it does not create a bank payment or a transaction. If paid, import the matching actual expense separately once. The simulator is read-only. Estimated future essential expenses are approximated by the forecast's **total** remaining spending, not a category-trained essentials model.
+
+New endpoints:
+
+- `POST /api/v1/simulations/purchase`
+- `POST /api/v1/bills`
+- `GET /api/v1/bills`
+- `PATCH /api/v1/bills/{bill_id}/paid`
 
 Copyright © 2026 Tech_Innovators. Licensed under the [MIT License](LICENSE).
