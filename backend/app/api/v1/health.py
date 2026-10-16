@@ -1,8 +1,5 @@
 from fastapi import APIRouter
-
-router = APIRouter(tags=["System"])
-
-
+router = APIRouter(tags=["health"])
 @router.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok", "project": "Monetra AI", "version": "0.1.0"}
+def health():
+    return {"status": "ok", "project": "Monetra AI", "version": "0.2.0"}
