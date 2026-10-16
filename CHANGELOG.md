@@ -1,3 +1,10 @@
+## [0.7.0] — Phase 4 Steps 18–20
+- Added deterministic intent routing and privacy-minimized finance context retrieval.
+- Added backend-only grounded Gemini explanations, cautious output guards and controlled outages.
+- Added read-only `POST /api/v1/assistant/chat` and integrated React chatbot.
+- Added assistant unit/API tests, full-file deliverables and verification instructions.
+- Copyright © 2026 Tech_Innovators; MIT License preserved.
+
 ## [0.6.0] — Phase 4 Steps 16–17
 
 - Add backend-only Gemini environment settings and independent hosted connection probe.
