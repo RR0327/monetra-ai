@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Activity, FileUp, RefreshCw, Wallet, ChartColumn, PiggyBank } from "lucide-react";
-import { getHealth, importTransactions, getTransactions, changeCategory, getSummary, getBudgets, saveBudget } from "./services/api";
+import { Activity, FileUp, RefreshCw, Wallet, ChartColumn, PiggyBank, TrendingUp, ShieldAlert } from "lucide-react";
+import { getHealth, importTransactions, getTransactions, changeCategory, getSummary, getBudgets, saveBudget, getForecast } from "./services/api";
 
 const categories = ["Income", "Food", "Transport", "Shopping", "Utilities", "Rent", "Health", "Education", "Other"];
 const expenseCategories = categories.filter(category => category !== "Income");
@@ -12,6 +12,7 @@ export default function App() {
   const [rows, setRows] = useState([]);
   const [summary, setSummary] = useState(null);
   const [budgets, setBudgets] = useState([]);
+  const [forecast, setForecast] = useState(null);
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -28,12 +29,13 @@ export default function App() {
   useEffect(() => {
     let active = true;
     setError("");
-    Promise.all([getTransactions({ month }), getSummary(month), getBudgets(month)])
-      .then(([transactionResponse, summaryResponse, budgetResponse]) => {
+    Promise.all([getTransactions({ month }), getSummary(month), getBudgets(month), getForecast(month)])
+      .then(([transactionResponse, summaryResponse, budgetResponse, forecastResponse]) => {
         if (!active) return;
         setRows(transactionResponse.data);
         setSummary(summaryResponse.data);
         setBudgets(budgetResponse.data);
+        setForecast(forecastResponse.data);
       })
       .catch(err => { if (active) setError(err.response?.data?.detail || "Could not load financial data"); });
     return () => { active = false; };
@@ -78,7 +80,7 @@ export default function App() {
         </header>
         <section className="py-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div><h2 className="text-3xl font-bold">Financial Dashboard</h2><p className="mt-2 text-slate-400">Phase 3 · Verified financial calculations and monthly category budgets</p></div>
+            <div><h2 className="text-3xl font-bold">Financial Dashboard</h2><p className="mt-2 text-slate-400">Phase 3 · Exact financial summaries, budgets, forecast and risk</p></div>
             <label className="text-sm text-slate-300">Selected month <input aria-label="Filter month" type="month" value={month} onChange={e => setMonth(e.target.value)} className="ml-2 rounded bg-slate-800 p-2"/></label>
           </div>
           <div className="mt-5 rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm"><div className="flex items-center gap-2 text-teal-300"><Activity size={18}/> Backend connection</div><p className="mt-2" role="status">{health}</p></div>
@@ -97,6 +99,21 @@ export default function App() {
             </div>)}
           </div>
           <p className="mt-2 text-xs text-slate-500">Balance includes earlier recorded transactions and the configured opening balance. Pending bills are reserved through the selected month's end; this is not a reconstructed historical statement.</p>
+          <section className="mt-8 rounded-xl border border-slate-800 bg-slate-900 p-5" aria-label="Spending forecast and financial risk">
+            <h3 className="flex items-center gap-2 text-xl font-semibold"><TrendingUp size={20}/> Month-end spending forecast</h3>
+            {!forecast ? <p className="mt-3 text-slate-400">Loading forecast...</p> : <>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div><p className="text-sm text-slate-400">Expenses through cutoff</p><p className="mt-1 text-xl font-semibold">{money(forecast.recorded_expenses_paisa)}</p></div>
+                <div><p className="text-sm text-slate-400">Projected month-end expenses</p><p className="mt-1 text-xl font-semibold">{forecast.projected_month_end_expenses_paisa == null ? "Not available" : money(forecast.projected_month_end_expenses_paisa)}</p></div>
+                <div><p className="text-sm text-slate-400">Estimated remaining expenses</p><p className="mt-1 text-xl font-semibold">{forecast.estimated_remaining_expenses_paisa == null ? "Not available" : money(forecast.estimated_remaining_expenses_paisa)}</p></div>
+                <div><p className="flex items-center gap-2 text-sm text-slate-400"><ShieldAlert size={16}/> Financial risk</p><p className={`mt-1 text-xl font-semibold ${forecast.risk_level === "high" ? "text-red-300" : forecast.risk_level === "medium" ? "text-amber-300" : "text-teal-300"}`}>{forecast.risk_level.toUpperCase()}</p></div>
+              </div>
+              <p className="mt-4 text-sm text-slate-300">{forecast.warning}</p>
+              <p className="mt-2 text-xs text-slate-400">Status: {forecast.status.replaceAll("_", " ")} · Confidence: {forecast.confidence} · {forecast.elapsed_days}/{forecast.days_in_month} calendar days · Cutoff: {forecast.cutoff_date || "Not yet started"}</p>
+              <p className="mt-2 text-xs text-slate-400">Available funds: {money(forecast.available_funds_paisa)} · Pending bills reserved: {money(forecast.unpaid_bills_paisa)} · Projected obligations: {forecast.projected_obligations_paisa == null ? "Not available" : money(forecast.projected_obligations_paisa)}{forecast.risk_ratio_percent == null ? "" : ` · Obligations/funds: ${forecast.risk_ratio_percent}%`}</p>
+              <details className="mt-3 text-sm text-slate-400"><summary className="cursor-pointer">View calculation assumptions</summary><ul className="mt-2 list-disc space-y-1 pl-5">{forecast.assumptions.map(text => <li key={text}>{text}</li>)}</ul></details>
+            </>}
+          </section>
           <div className="mt-8 grid gap-5 lg:grid-cols-2">
             <section className="rounded-xl border border-slate-800 bg-slate-900 p-5">
               <h3 className="flex items-center gap-2 text-xl font-semibold"><ChartColumn size={20}/> Category spending</h3>

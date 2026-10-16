@@ -16,3 +16,5 @@ export const getSummary = (month) => api.get("/api/v1/summary", { params: { mont
 export const getBudgets = (month) => api.get("/api/v1/budgets", { params: { month } });
 export const saveBudget = (body) => api.put("/api/v1/budgets", body);
 export default api;
+
+export const getForecast = (month) => api.get("/api/v1/forecast", { params: { month } });
