@@ -7,9 +7,12 @@ import Forecast from "./pages/Forecast";
 import Assistant from "./pages/Assistant";
 import Bills from "./pages/Bills";
 import { categories, expenseCategories, money, currentMonth, toPaisa } from "./utils/format";
-import { getHealth, importTransactions, getTransactions, changeCategory, getSummary, getBudgets, saveBudget, getForecast, getBills, createBill, markBillPaid, simulatePurchase, askAssistant } from "./services/api";
+import { getHealth, importTransactions, getTransactions, changeCategory, getSummary, getBudgets, saveBudget, getForecast, getBills, createBill, markBillPaid, simulatePurchase, askAssistant, getMe, logout } from "./services/api";
+import Auth from "./pages/Auth";
 
 function MonetraApp() {
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const [health, setHealth] = useState("Checking backend...");
@@ -39,10 +42,19 @@ function MonetraApp() {
   const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
+    if (!localStorage.getItem("monetra_token")) { setAuthChecked(true); return undefined; }
+    getMe().then(({ data }) => setUser(data)).catch(() => localStorage.removeItem("monetra_token")).finally(() => setAuthChecked(true));
+    const expired = () => { setUser(null); setAuthChecked(true); };
+    window.addEventListener("monetra-auth-expired", expired);
+    return () => window.removeEventListener("monetra-auth-expired", expired);
+  }, []);
+
+  useEffect(() => {
     getHealth().then(({ data }) => setHealth(`Connected — ${data.project} API v${data.version}`))
       .catch(() => setHealth("Backend unavailable. Start FastAPI on port 8000."));
   }, []);
   useEffect(() => {
+    if (!user) return undefined;
     let active = true;
     setError(""); setLoading(true);
     Promise.all([getTransactions({ month }), getSummary(month), getBudgets(month), getForecast(month), getBills()])
@@ -130,6 +142,11 @@ function MonetraApp() {
     finally { setBusy(false); }
   }
 
+  if (!authChecked) return <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">Checking session...</main>;
+  if (!user) return <Auth onAuthenticated={setUser} />;
+  async function signOut() {
+    try { await logout(); } finally { localStorage.removeItem("monetra_token"); setUser(null); }
+  }
 
   const vm = { summary, budgets, forecast, rows, bills, question, setQuestion, chatResult, chatBusy, chatError, sendQuestion, purchaseAmount, setPurchaseAmount, purchaseCategory, setPurchaseCategory, simulation, runSimulation, billTitle, setBillTitle, billDue, setBillDue, billAmount, setBillAmount, addBill, payBill, report, upload, correct, busy, month, category, setCategory, limit, setLimit, submitBudget };
   const links = [
@@ -146,7 +163,7 @@ function MonetraApp() {
         <aside className="shrink-0 border-b border-slate-800 bg-slate-900/80 p-5 lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r" aria-label="Primary navigation">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3"><span className="rounded-xl bg-teal-400/15 p-3 text-teal-300"><Wallet size={26}/></span><div><h1 className="text-xl font-bold">Monetra AI</h1><p className="text-xs text-slate-400">Tech_Innovators</p></div></div>
-            <button aria-label="Toggle navigation" aria-expanded={menuOpen} className="rounded border border-slate-700 p-2 lg:hidden" onClick={() => setMenuOpen(!menuOpen)}><Menu size={20}/></button>
+            <div className="flex gap-2"><button onClick={signOut} className="rounded border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:text-white">Log out</button><button aria-label="Toggle navigation" aria-expanded={menuOpen} className="rounded border border-slate-700 p-2 lg:hidden" onClick={() => setMenuOpen(!menuOpen)}><Menu size={20}/></button></div>
           </div>
           <nav aria-label="Main pages" className={`${menuOpen ? "flex" : "hidden"} mt-6 flex-col gap-2 lg:flex`}>
             {links.map(({to,text,icon: Icon}) => <NavLink key={to} to={to} onClick={() => setMenuOpen(false)} className={({isActive}) => `flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors ${isActive ? "bg-teal-500/15 font-semibold text-teal-200" : "text-slate-300 hover:bg-slate-800 hover:text-white"}`}><Icon size={19}/>{text}</NavLink>)}
