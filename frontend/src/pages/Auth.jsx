@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { login, logout, register } from "../services/api";
 
 export default function Auth({ onAuthenticated, initialMode = "login" }) {
   const navigate = useNavigate();
-  const [mode] = useState(initialMode);
+  const location = useLocation();
+  const mode = location.pathname === "/register" ? "register" : initialMode;
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [identifier, setIdentifier] = useState("");
