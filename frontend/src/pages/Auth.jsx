@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { login, register } from "../services/api";
+import { Link, useNavigate } from "react-router-dom";
+import { login, logout, register } from "../services/api";
 
-export default function Auth({ onAuthenticated }) {
-  const [mode, setMode] = useState("login");
+export default function Auth({ onAuthenticated, initialMode = "login" }) {
+  const navigate = useNavigate();
+  const [mode] = useState(initialMode);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [identifier, setIdentifier] = useState("");
@@ -31,7 +33,13 @@ export default function Auth({ onAuthenticated }) {
         ? login({ identifier, password })
         : register({ username, email, password, confirm_password: confirmPassword }));
       localStorage.setItem("monetra_token", response.data.token);
-      onAuthenticated(response.data.user);
+      if (mode === "register") {
+        await logout();
+        localStorage.removeItem("monetra_token");
+        navigate("/login", { replace: true });
+      } else {
+        onAuthenticated(response.data.user);
+      }
     } catch (err) {
       setError(err.response?.data?.detail || "Authentication failed.");
     } finally {
@@ -74,9 +82,10 @@ export default function Auth({ onAuthenticated }) {
         <button disabled={busy} className="mt-6 w-full rounded-lg bg-teal-400 px-4 py-3 font-semibold text-slate-950 disabled:opacity-50">
           {busy ? "Please wait..." : mode === "login" ? "Log in" : "Register"}
         </button>
-        <button type="button" onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }} className="mt-4 w-full text-sm text-teal-300">
+        <Link to={mode === "login" ? "/register" : "/login"} className="mt-4 block w-full cursor-pointer text-center text-sm text-teal-300 hover:text-teal-200">
           {mode === "login" ? "New user? Register" : "Already registered? Log in"}
-        </button>
+        </Link>
+        <Link to="/" className="mt-4 block text-center text-sm text-slate-500 hover:text-slate-300">Back to home</Link>
       </form>
     </main>
   );

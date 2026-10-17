@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Activity, Wallet, LayoutDashboard, List, TrendingUp, MessageSquare, Receipt, Menu } from "lucide-react";
-import { BrowserRouter, Routes, Route, Navigate, NavLink, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, NavLink, useLocation, useNavigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Forecast from "./pages/Forecast";
@@ -9,12 +9,14 @@ import Bills from "./pages/Bills";
 import { categories, expenseCategories, money, currentMonth, toPaisa } from "./utils/format";
 import { getHealth, importTransactions, getTransactions, changeCategory, getSummary, getBudgets, saveBudget, getForecast, getBills, createBill, markBillPaid, simulatePurchase, askAssistant, getMe, logout } from "./services/api";
 import Auth from "./pages/Auth";
+import Home from "./pages/Home";
 
 function MonetraApp() {
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const [health, setHealth] = useState("Checking backend...");
   const [rows, setRows] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -143,9 +145,20 @@ function MonetraApp() {
   }
 
   if (!authChecked) return <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">Checking session...</main>;
-  if (!user) return <Auth onAuthenticated={setUser} />;
+  if (!user) {
+    if (location.pathname === "/register") {
+      return <Auth initialMode="register" onAuthenticated={(nextUser) => { setUser(nextUser); navigate("/dashboard", { replace: true }); }} />;
+    }
+    if (location.pathname === "/login") {
+      return <Auth initialMode="login" onAuthenticated={(nextUser) => { setUser(nextUser); navigate("/dashboard", { replace: true }); }} />;
+    }
+    return <Home />;
+  }
+  if (location.pathname === "/" || location.pathname === "/login" || location.pathname === "/register") {
+    return <Navigate to="/dashboard" replace />;
+  }
   async function signOut() {
-    try { await logout(); } finally { localStorage.removeItem("monetra_token"); setUser(null); }
+    try { await logout(); } finally { localStorage.removeItem("monetra_token"); setUser(null); navigate("/", { replace: true }); }
   }
 
   const vm = { summary, budgets, forecast, rows, bills, question, setQuestion, chatResult, chatBusy, chatError, sendQuestion, purchaseAmount, setPurchaseAmount, purchaseCategory, setPurchaseCategory, simulation, runSimulation, billTitle, setBillTitle, billDue, setBillDue, billAmount, setBillAmount, addBill, payBill, report, upload, correct, busy, month, category, setCategory, limit, setLimit, submitBudget };
@@ -181,7 +194,6 @@ function MonetraApp() {
           {notice && <p className="mt-4 text-teal-300" role="status">{notice}</p>}
           <div className="pt-4" aria-busy={loading}>
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
               <Route path="/dashboard" element={<Dashboard vm={vm}/>}/>
               <Route path="/transactions" element={<Transactions vm={vm}/>}/>
               <Route path="/forecast" element={<Forecast vm={vm}/>}/>
