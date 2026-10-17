@@ -9,6 +9,7 @@ from app.api.v1.prediction import router as prediction_router
 from app.api.v1.bills import router as bills_router
 from app.api.v1.simulation import router as simulation_router
 from app.api.v1.assistant import router as assistant_router
+from app.api.v1.auth import router as auth_router
 from app.core.database import initialize_database
 
 @asynccontextmanager
@@ -30,3 +31,4 @@ app.include_router(bills_router, prefix="/api/v1")
 app.include_router(simulation_router, prefix="/api/v1")
 
 app.include_router(assistant_router, prefix="/api/v1")
+app.include_router(auth_router, prefix="/api/v1")

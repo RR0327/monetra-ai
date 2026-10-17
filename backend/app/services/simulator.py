@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from app.services.finance import summary_for_month
 from app.services.prediction import forecast_for_month, classify_risk
 
-def simulate_purchase(db: Session, month: str, amount: int, category: str) -> dict:
-    summary = summary_for_month(db, month)
-    forecast = forecast_for_month(db, month)
+def simulate_purchase(db: Session, user_id: int, month: str, amount: int, category: str) -> dict:
+    summary = summary_for_month(db, user_id, month)
+    forecast = forecast_for_month(db, user_id, month)
     balance_after = summary['balance_paisa'] - amount
     after_bills = balance_after - summary['unpaid_bills_paisa']
     remaining = forecast['estimated_remaining_expenses_paisa']

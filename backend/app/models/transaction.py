@@ -1,5 +1,5 @@
 from datetime import date
-from sqlalchemy import CheckConstraint, Date, Integer, String, UniqueConstraint
+from sqlalchemy import CheckConstraint, Date, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
@@ -8,9 +8,10 @@ class Transaction(Base):
     __table_args__ = (
         CheckConstraint("amount_paisa > 0", name="positive_transaction_amount"),
         CheckConstraint("type IN ('income', 'expense')", name="valid_transaction_type"),
-        UniqueConstraint("fingerprint", name="uq_transaction_fingerprint"),
+        UniqueConstraint("user_id", "fingerprint", name="uq_transaction_user_fingerprint"),
     )
     id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), index=True, nullable=True)
     date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     description: Mapped[str] = mapped_column(String(300), nullable=False)
     type: Mapped[str] = mapped_column(String(10), nullable=False)

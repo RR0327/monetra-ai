@@ -6,16 +6,19 @@ from app.core.gemini_config import get_gemini_settings
 from app.schemas.assistant import ChatInput, ChatOutput
 from app.services.assistant import classify_intent, extract_purchase_amount, build_financial_context
 from app.services.gemini_assistant import generate_explanation
+from app.core.auth import get_current_user
+from app.models import User
 
 router = APIRouter(tags=['assistant'])
 
 @router.post('/assistant/chat', response_model=ChatOutput)
-def assistant_chat(payload: ChatInput, db: Session = Depends(get_db)):
+def assistant_chat(payload: ChatInput, db: Session = Depends(get_db),
+                   user: User = Depends(get_current_user)):
     intent = classify_intent(payload.question)
     amount = payload.purchase_amount_paisa
     if intent == 'purchase' and amount is None:
         amount = extract_purchase_amount(payload.question)
-    context = build_financial_context(db, payload.month, intent, amount)
+    context = build_financial_context(db, user.id, payload.month, intent, amount)
     limitations = [
         'Educational prototype using fictional data; not professional financial advice.',
         'Python calculations are authoritative. Gemini explanations are supplementary.',

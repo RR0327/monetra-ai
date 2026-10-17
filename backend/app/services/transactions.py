@@ -32,7 +32,7 @@ def fingerprint(day: date, description: str, kind: str, paisa: int) -> str:
     canonical = f"{day.isoformat()}|{description.casefold().strip()}|{kind}|{paisa}"
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
-def import_csv(db: Session, content: bytes) -> dict:
+def import_csv(db: Session, content: bytes, user_id: int) -> dict:
     if not content or len(content) > MAX_UPLOAD_BYTES:
         raise ValueError("CSV must not be empty or exceed 2 MB")
     try:
@@ -71,12 +71,14 @@ def import_csv(db: Session, content: bytes) -> dict:
                 if supplied and supplied not in ALLOWED_CATEGORIES:
                     raise ValueError("category is not supported")
                 category = supplied or categorize(description, kind)
-                identifier = fingerprint(day, description, kind, paisa)
+                # Keep deduplication private to the account, even on legacy
+                # SQLite databases that still have a global fingerprint index.
+                identifier = hashlib.sha256(f"{user_id}|{fingerprint(day, description, kind, paisa)}".encode()).hexdigest()
                 if identifier in seen:
                     duplicates += 1
                     continue
                 seen.add(identifier)
-                candidates.append(Transaction(date=day, description=description, type=kind,
+                candidates.append(Transaction(user_id=user_id, date=day, description=description, type=kind,
                                               category=category, amount_paisa=paisa, fingerprint=identifier))
             except (ValueError, TypeError) as exc:
                 invalid.append({"row": row_number, "reason": str(exc)})
@@ -86,7 +88,8 @@ def import_csv(db: Session, content: bytes) -> dict:
     existing = set()
     if candidates:
         identifiers = [item.fingerprint for item in candidates]
-        existing = set(db.scalars(select(Transaction.fingerprint).where(Transaction.fingerprint.in_(identifiers))).all())
+        existing = set(db.scalars(select(Transaction.fingerprint).where(
+            Transaction.user_id == user_id, Transaction.fingerprint.in_(identifiers))).all())
     new_items = [item for item in candidates if item.fingerprint not in existing]
     duplicates += len(candidates) - len(new_items)
     try:

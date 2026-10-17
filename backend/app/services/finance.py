@@ -18,16 +18,18 @@ def calculate_summary(opening_balance: int, income: int, expenses: int, unpaid_b
             "unpaid_bills_paisa": unpaid_bills, "spendable_paisa": balance - unpaid_bills}
 
 
-def summary_for_month(db: Session, month: str) -> dict:
+def summary_for_month(db: Session, user_id: int, month: str) -> dict:
     start, next_start = month_bounds(month)
-    opening = db.scalar(select(Setting.opening_balance_paisa).order_by(Setting.id).limit(1)) or 0
+    opening = db.scalar(select(Setting.opening_balance_paisa).where(Setting.user_id == user_id)
+                        .order_by(Setting.id).limit(1)) or 0
     # Previous transactions contribute to balance carried into this month.
     earlier = db.execute(select(Transaction.type, func.coalesce(func.sum(Transaction.amount_paisa), 0))
-        .where(Transaction.date < start).group_by(Transaction.type)).all()
+        .where(Transaction.user_id == user_id, Transaction.date < start).group_by(Transaction.type)).all()
     earlier_totals = dict(earlier)
     carried = opening + earlier_totals.get('income', 0) - earlier_totals.get('expense', 0)
     current_rows = db.execute(select(Transaction.type, Transaction.category,
         func.sum(Transaction.amount_paisa)).where(Transaction.date >= start, Transaction.date < next_start)
+        .where(Transaction.user_id == user_id, Transaction.date >= start, Transaction.date < next_start)
         .group_by(Transaction.type, Transaction.category)).all()
     income = sum(amount for kind, _, amount in current_rows if kind == 'income')
     expenses = sum(amount for kind, _, amount in current_rows if kind == 'expense')
@@ -35,7 +37,7 @@ def summary_for_month(db: Session, month: str) -> dict:
     # Pending bills are reserved only if due on or before the selected month's end.
     # Historical snapshots are not reconstructed; statuses reflect current DB state.
     unpaid = db.scalar(select(func.coalesce(func.sum(Bill.amount_paisa), 0))
-        .where(Bill.status == 'pending', Bill.due_date < next_start)) or 0
+        .where(Bill.user_id == user_id, Bill.status == 'pending', Bill.due_date < next_start)) or 0
     result = calculate_summary(carried, income, expenses, unpaid)
     return {"month": month, "currency": "BDT", "opening_balance_paisa": carried,
             **result, "category_expenses_paisa": dict(sorted(categories.items()))}

@@ -25,7 +25,7 @@ def classify_risk(projected_obligations_paisa: int, available_funds_paisa: int) 
     return 'high'
 
 
-def forecast_for_month(db: Session, month: str, as_of: date | None = None) -> dict:
+def forecast_for_month(db: Session, user_id: int, month: str, as_of: date | None = None) -> dict:
     today = as_of or date.today()
     start, next_start = month_bounds(month)
     days = monthrange(start.year, start.month)[1]
@@ -36,17 +36,19 @@ def forecast_for_month(db: Session, month: str, as_of: date | None = None) -> di
     spent = 0
     if elapsed:
         spent = db.scalar(select(func.coalesce(func.sum(Transaction.amount_paisa), 0)).where(
-            Transaction.type == 'expense', Transaction.date >= start, Transaction.date <= cutoff)) or 0
+            Transaction.user_id == user_id, Transaction.type == 'expense',
+            Transaction.date >= start, Transaction.date <= cutoff)) or 0
     estimated = forecast_month_end(spent, elapsed, days)
     complete = elapsed == days
     status = 'not_available' if elapsed == 0 else ('actual' if complete else 'forecast')
     confidence = 'unavailable' if elapsed == 0 else ('actual' if complete else ('low' if elapsed < 7 else 'indicative'))
     # Forecast totals are the entire month's expenses. Avoid adding expenses
     # already recorded a second time when classifying risk.
-    summary = summary_for_month(db, month)
+    summary = summary_for_month(db, user_id, month)
     available = summary['opening_balance_paisa'] + (
         db.scalar(select(func.coalesce(func.sum(Transaction.amount_paisa), 0)).where(
-            Transaction.type == 'income', Transaction.date >= start, Transaction.date <= cutoff)) or 0
+            Transaction.user_id == user_id, Transaction.type == 'income',
+            Transaction.date >= start, Transaction.date <= cutoff)) or 0
     )
     # Pending bills are reserved once; paid bills do not count as pending.
     # The summary service reserves currently pending bills through month end.
