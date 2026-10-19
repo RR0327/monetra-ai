@@ -1,3 +1,124 @@
+
 @import "tailwindcss";
 
-:root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+/* =================================
+   MONETRA AI - GLOBAL STYLES
+================================= */
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* =================================
+   ENTRANCE ANIMATIONS
+================================= */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero text animation */
+
+.hero-animate {
+  animation: fadeUp 0.8s ease-out both;
+}
+
+/* Financial overview card animation */
+
+.hero-animate-delayed {
+  animation: fadeUp 1s ease-out 0.2s both;
+}
+
+/* Feature cards animation */
+
+.feature-reveal {
+  animation: fadeUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* =================================
+   FEATURE CARD EFFECTS
+================================= */
+
+.feature-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(45, 212, 191, 0.08),
+    transparent 65%
+  );
+
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.feature-card:hover::before {
+  opacity: 1;
+}
+
+/* =================================
+   FOOTER LINK ANIMATION
+================================= */
+
+.footer-link {
+  width: fit-content;
+
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.footer-link:hover {
+  color: #5eead4;
+  transform: translateX(4px);
+}
+
+/* =================================
+   ACCESSIBILITY
+================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-animate,
+  .hero-animate-delayed,
+  .feature-reveal {
+    animation: none;
+  }
+
+  .feature-card,
+  .feature-icon,
+  .footer-link {
+    transition: none !important;
+  }
+
+  .feature-card:hover,
+  .footer-link:hover {
+    transform: none;
+  }
+}

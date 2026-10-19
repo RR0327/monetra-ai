@@ -185,11 +185,72 @@ function MonetraApp() {
         </aside>
         <main className="min-w-0 flex-1 px-4 py-7 sm:px-7 lg:px-10">
           <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
-            <div><h2 className="text-2xl font-bold sm:text-3xl">{active.text}</h2><p className="mt-1 text-sm text-slate-400">Phase 5 · Integrated financial workspace</p></div>
+            <div><h2 className="text-2xl font-bold sm:text-3xl">{active.text}</h2><p className="mt-1 text-sm text-slate-400">Financial workspace</p></div>
             <label className="text-sm text-slate-300">Selected month <input aria-label="Filter month" type="month" value={month} onChange={e => setMonth(e.target.value)} className="ml-2 rounded border border-slate-700 bg-slate-800 p-2"/></label>
           </header>
-          <div className="mt-5 rounded-xl border border-slate-800 bg-slate-900 p-3 text-sm"><div className="flex items-center gap-2 text-teal-300"><Activity size={17}/> Backend connection</div><p className="mt-1 text-slate-300" role="status">{health}</p></div>
-          {loading && <p className="mt-4 rounded border border-slate-700 bg-slate-900 p-3 text-slate-300" role="status">Loading verified financial data…</p>}
+        
+{/* Financial Workspace Status */}
+<div className="group mt-5 rounded-xl border border-teal-400/20 bg-gradient-to-r from-slate-900 to-slate-900/80 p-4 text-sm transition-all duration-300 hover:border-teal-400/40">
+
+  <div className="flex flex-wrap items-center justify-between gap-3">
+
+    <div className="flex items-center gap-3">
+      <div className="rounded-lg bg-teal-400/10 p-2 text-teal-300">
+        <Activity size={19} />
+      </div>
+
+      <div>
+        <h3 className="font-semibold text-white">
+          Your Financial Workspace
+        </h3>
+
+        <p className="mt-1 text-xs text-slate-400">
+          Your financial tools, all in one place.
+        </p>
+      </div>
+    </div>
+
+    {/* Dynamic Connection Status */}
+    <span
+      role="status"
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${
+        loading
+          ? "border-amber-400/20 bg-amber-400/10 text-amber-300"
+          : /connected/i.test(health) && !/disconnected|not connected/i.test(health)
+            ? "border-teal-400/20 bg-teal-400/10 text-teal-300"
+            : "border-red-400/20 bg-red-400/10 text-red-300"
+      }`}
+    >
+      <span
+        className={`h-2 w-2 rounded-full ${
+          loading
+            ? "animate-pulse bg-amber-400"
+            : /connected/i.test(health) && !/disconnected|not connected/i.test(health)
+              ? "bg-teal-400"
+              : "bg-red-400"
+        }`}
+      />
+
+      {loading
+        ? "Syncing"
+        : /connected/i.test(health) && !/disconnected|not connected/i.test(health)
+          ? "Online"
+          : "Offline"}
+    </span>
+  </div>
+
+  {/* Data Loading */}
+  {loading && (
+    <div
+      className="mt-4 flex items-center gap-3 border-t border-slate-800 pt-4 text-xs text-slate-400"
+      role="status"
+    >
+      <span className="h-4 w-4 animate-spin rounded-full border-2 border-teal-400/20 border-t-teal-400" />
+      Preparing your financial overview...
+    </div>
+  )}
+</div>
+
           {error && <p className="mt-4 rounded border border-red-800 bg-red-950/30 p-3 text-red-300" role="alert">{String(error)}</p>}
           {notice && <p className="mt-4 text-teal-300" role="status">{notice}</p>}
           <div className="pt-4" aria-busy={loading}>
@@ -202,7 +263,7 @@ function MonetraApp() {
               <Route path="*" element={<Navigate to="/dashboard" replace/>}/>
             </Routes>
           </div>
-          <footer className="mt-10 border-t border-slate-800 py-5 text-sm text-slate-500">Copyright © 2026 Tech_Innovators. · MIT License · Educational prototype</footer>
+          <footer className="mt-10 border-t border-slate-800 py-5 text-sm text-slate-500">Copyright © 2026 Tech_Innovators.</footer>
         </main>
       </div>
     </div>
