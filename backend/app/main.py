@@ -1,4 +1,5 @@
 """Monetra AI FastAPI application."""
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,9 +18,14 @@ async def lifespan(app: FastAPI):
     initialize_database()
     yield
 
+frontend_url = os.getenv("FRONTEND_URL", "").strip().rstrip("/")
+allowed_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+if frontend_url and frontend_url not in allowed_origins:
+    allowed_origins.append(frontend_url)
+
 app = FastAPI(title="Monetra AI API", version="0.7.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
 app.include_router(health_router, prefix="/api/v1")
 app.include_router(transactions_router, prefix="/api/v1")
