@@ -160,7 +160,7 @@ python manage.py check
 ```
 
 Monetra uses FastAPI rather than Django. Use the project's actual test commands:
-
+<!--
 ```bash
 python -m pytest -v
 ```
@@ -176,7 +176,7 @@ node --test tests/architecture.test.mjs
 ```
 
 ### Phase 6 release checks
-
+-->
 From `backend/`:
 
 ```bash
